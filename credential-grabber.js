@@ -2,15 +2,18 @@ const express = require('express');
 const httpUtils = require('./lib/http-utils');
 
 async function main() {
+    let site = process.argv[2];
+
     let app = express();
     app.set('view engine', 'html');
 
-    let pageContent = await httpUtils.getPageContents();
-    pageContent = httpUtils.stripScripts(pageContent.split("\n"));
+    let pageContent = await httpUtils.getPageContents(site);
+    console.log(pageContent);
+    //pageContent = httpUtils.stripScripts(pageContent.split("\n"));
 
     // TODO: Generate smart payloads
     let payload = '<script>document.getElementById("next").addEventListener("click", function(){console.log("test");});</script>';
-    pageContent = httpUtils.injectScript(pageContent, payload);
+    //pageContent = httpUtils.injectScript(pageContent, payload);
 
     app.get('/', function(req, res) {
         res.send(pageContent);
