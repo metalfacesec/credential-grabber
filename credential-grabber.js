@@ -1,24 +1,22 @@
-var request = require("request");
-var express = require('express');
-var app = express();
-const cheerio = require('cheerio')
+const express = require('express');
+const httpUtils = require('./lib/http-utils');
 
-request({
-  uri: "https://accounts.google.com/signin/v2/identifier?flowName=GlifWebSignIn&flowEntry=ServiceLogin",
-}, function(error, response, body) {
-    const $ = cheerio.load(body);
-    
-    let allInputs = $(':input');
-    allInputs.toArray().map(element => {
-        console.log($(element).attr('placeholder'));
-        console.log("!!!!!!!!!!!");
-    });
+async function main() {
+    let app = express();
+    app.set('view engine', 'html');
 
+    let pageContent = await httpUtils.getPageContents();
+    pageContent = httpUtils.stripScripts(pageContent.split("\n"));
+
+    // TODO: Generate smart payloads
+    let payload = '<script>document.getElementById("next").addEventListener("click", function(){console.log("test");});</script>';
+    pageContent = httpUtils.injectScript(pageContent, payload);
 
     app.get('/', function(req, res) {
-        res.send(body)
+        res.send(pageContent);
     });
 
-    app.set('view engine', 'html');
     app.listen(8080);
-});
+}
+
+main();
