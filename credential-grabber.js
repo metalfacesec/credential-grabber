@@ -8,12 +8,14 @@ async function main() {
     app.set('view engine', 'html');
 
     let pageContent = await httpUtils.getPageContents(site);
-    console.log(pageContent);
+
+    pageContent = httpUtils.replaceLocalLinksWithOrigin(pageContent, httpUtils.extractDomainFromURL(site));
+
     //pageContent = httpUtils.stripScripts(pageContent.split("\n"));
 
     // TODO: Generate smart payloads
-    let payload = '<script>document.getElementById("next").addEventListener("click", function(){console.log("test");});</script>';
-    //pageContent = httpUtils.injectScript(pageContent, payload);
+    // let payload = '<script>document.getElementById("next").addEventListener("click", function(){console.log("test");});</script>';
+    // pageContent = httpUtils.injectScript(pageContent, payload);
 
     app.get('/', function(req, res) {
         res.send(pageContent);
